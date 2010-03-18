@@ -1,0 +1,21 @@
+An experiment to create the analog of Haskell's Parsec library not on
+the basis of monads, but in ANSI CL, using the signal protocol,
+special variables and macros.
+
+Different test-cases are gathered in examples/.
+
+A note on terminology: these parsers are generic and can (in theory)
+work on other objects, than characters.  Those objects could be called
+tokens, but this name is quite heavily used in parsers, so not to
+create confusion a different term is used: `items'.
+
+Example usage with the parser, defined in examples/better-veselov.lisp:
+
+CL-USER> (with-input-from-string (in "1 + 2-10 ^ ac1(ac+f(),2)")
+           (parse in 'expression))
+((:ATOM "1") (:OP #\+) (:ATOM "2") (:OP #\-) (:ATOM "10") (:OP #\^)
+ (:FUNC "ac1" ((:ATOM "ac") (:OP #\+) (:FUNC "f")) ((:ATOM "2"))))
+
+CL-USER> (with-input-from-string (in "1 + 2-10 ^ ac1(")
+           (parse in 'expression))
+=> Parse error.  Error stack: ((EXPRESSION) (EOF))

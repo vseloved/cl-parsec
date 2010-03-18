@@ -1,0 +1,8 @@
+*~
+*.fasl
+\#*
+.\#*
+*.log
+tmp/*
+.*
+!.gitignore
