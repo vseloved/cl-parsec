@@ -5,44 +5,42 @@
 (defparser many (parser)
   "Returns all results of PARSER's application."
   (let (rez)
-    (till-end ((reverse rez))
+    (if-end (reverse rez)
       (loop (push (funcall parser) rez)))))
 
 (defparser many+ (parser)
-  "Returns all results of PARSER's application.  PARSER should return
+  "Returns all results of PARSER's application.  PARSER should return ~
 successfully at least once."
   (cons (funcall parser)
         (many parser)))
 
 (defparser either (&rest parsers)
-  "If either of the PARSERS returns non-nil, return its result.
+  "If either of the PARSERS returns non-nil, return its result. ~
 Ordering matters.
 
-LL(1) variant.  If it doesn't suit you, use this pattern:
-  (either (try ...))"
+LL(1) variant.  If it doesn't suit you, use this pattern: (EITHER (TRY ...))"
   (dolist (parser parsers)
-    (till-err ()
-      (when-it (funcall parser)
-        (return-from either it))))
+    (if-err nil
+      (return-from either (funcall parser))))
   (?!))
 
 (defparser try (parser)
-  "Returns the result of PARSER's application or `unreads' all the
+  "Returns the result of PARSER's application or `unreads' all the ~
 read items back."
-  (let ((old-backlog *backlog*)
-        backlog)
-    (handler-bind ((want-more
-                    (lambda (c)
-                      (unless (member :try (more-features c))
-                        (push last-item backlog)
-                        (signal 'want-more
-                                :features (cons :try
-                                                (more-features c)))))))
-      (till-end ((setf *backlog* (if (> (length old-backlog) (length backlog))
-                                     old-backlog
-                                     (nreverse backlog))
-                       *source* :backlog)
-                 nil)
-        (funcall parser)))))
+  (let (backlog)
+    (prog1 (intercept-signals this-signal
+               ((parsec-success (push (parsing-result this-signal) backlog))
+                (try-success (setf backlog (append (parsing-backlog this-signal)
+                                                   backlog))))
+             (if-end (progn (setf *backlog* (append (reverse backlog) *backlog*)
+                                  *source* :backlog)
+                            (?!))
+               (funcall parser)))
+      (signal 'try-success :backlog backlog))))
+
+(defparser maybe (parser)
+  "A wrapper around TRY to ignore unsuccessfull attempts and simply return NIL."
+  (if-err ()
+    (try parser)))
 
 ;;; end

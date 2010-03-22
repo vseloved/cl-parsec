@@ -3,8 +3,8 @@
 (in-package :cl-parsec)
 
 (defparser eof ()
-  (till-eof ((return-from eof t))
-    next-item)
+  (if-eof (return-from eof t)
+    (next-item))
   (?!))
 
 ;;; end

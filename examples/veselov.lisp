@@ -1,5 +1,7 @@
 ;;; http://dying-sphynx.livejournal.com/66854.html
 
+(in-package :parsec-test)
+
 (defparser expression ()
   (skip-many #\Space)
   (prog1 (many+ #'tok)

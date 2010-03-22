@@ -5,13 +5,13 @@
 
 (defsystem #:cl-parsec
   :name "Parser combinators"
-  :version '(0 0 1)
+  :version '(0 1 1)
   :maintainer "Vsevolod Dyomkin <vseloved@gmail.com>"
   :licence "MIT"
   :description "Parser combinators in plain ANSI CL without monads."
   :depends-on (:rutils)
   :serial t
-  :components ((:file "package")
+  :components ((:file "packages")
                (:file "core")
                (:file "simple")
                (:file "item-level")
