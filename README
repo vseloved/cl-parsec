@@ -19,3 +19,5 @@ CL-USER> (with-input-from-string (in "1 + 2-10 ^ ac1(ac+f(),2)")
 CL-USER> (with-input-from-string (in "1 + 2-10 ^ ac1(")
            (parse in 'expression))
 => Parse error.  Error stack: ((EXPRESSION) (EOF))
+
+Caution: not ready for production use.

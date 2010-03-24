@@ -15,8 +15,7 @@ successfully at least once."
         (many parser)))
 
 (defparser either (&rest parsers)
-  "If either of the PARSERS returns non-nil, return its result. ~
-Ordering matters.
+  "If either of the PARSERS returns, return its result. Ordering matters.
 
 LL(1) variant.  If it doesn't suit you, use this pattern: (EITHER (TRY ...))"
   (dolist (parser parsers)
@@ -28,9 +27,9 @@ LL(1) variant.  If it doesn't suit you, use this pattern: (EITHER (TRY ...))"
   "Returns the result of PARSER's application or `unreads' all the ~
 read items back."
   (let (backlog)
-    (prog1 (intercept-signals this-signal
-               ((parsec-success (push (parsing-result this-signal) backlog))
-                (try-success (setf backlog (append (parsing-backlog this-signal)
+    (prog1 (intercept-signals cur-signal
+               ((parsec-success (push (parsing-result cur-signal) backlog))
+                (try-success (setf backlog (append (parsing-backlog cur-signal)
                                                    backlog))))
              (if-end (progn (setf *backlog* (append (reverse backlog) *backlog*)
                                   *source* :backlog)
@@ -40,7 +39,7 @@ read items back."
 
 (defparser maybe (parser)
   "A wrapper around TRY to ignore unsuccessfull attempts and simply return NIL."
-  (if-err ()
+  (if-err nil
     (try parser)))
 
 ;;; end
